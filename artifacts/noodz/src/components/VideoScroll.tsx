@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
 
 export default function VideoScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [duration, setDuration] = useState(0);
+  const videoRef     = useRef<HTMLVideoElement>(null);
+  const durationRef  = useRef(0);
+  const lastTimeRef  = useRef(-1);
+  const readyRef     = useRef(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -15,89 +17,146 @@ export default function VideoScroll() {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleMetadata = () => {
-      setDuration(video.duration);
+    const prime = () => {
+      if (readyRef.current) return;
+      readyRef.current  = true;
+      durationRef.current = video.duration;
+
+      // Play-then-pause trick — forces the browser to decode & show frame 0
+      const p = video.play();
+      if (p !== undefined) {
+        p.then(() => {
+          video.pause();
+          video.currentTime = 0;
+        }).catch(() => {
+          // Autoplay blocked (unlikely since muted) — still set time
+          video.currentTime = 0;
+        });
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
     };
 
-    video.addEventListener("loadedmetadata", handleMetadata);
-    if (video.readyState >= 1) handleMetadata();
+    // canplaythrough = enough data buffered; fire prime as soon as possible
+    if (video.readyState >= 3) {
+      prime();
+    } else {
+      video.addEventListener("canplay", prime, { once: true });
+    }
 
-    return () => video.removeEventListener("loadedmetadata", handleMetadata);
+    // Prevent accidental re-play by browser after seeking
+    const keepPaused = () => {
+      if (readyRef.current) video.pause();
+    };
+    video.addEventListener("play", keepPaused);
+
+    return () => {
+      video.removeEventListener("canplay", prime);
+      video.removeEventListener("play", keepPaused);
+    };
   }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const video = videoRef.current;
+  // Map scroll progress → video.currentTime
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    const video    = videoRef.current;
+    const duration = durationRef.current;
     if (!video || !duration) return;
-    const targetTime = latest * duration;
-    if (Math.abs(video.currentTime - targetTime) > 0.05) {
-      video.currentTime = targetTime;
-    }
+
+    const target = Math.min(duration, Math.max(0, progress * duration));
+    // Skip seek if within one 30-fps frame — avoids jank on tiny scroll events
+    if (Math.abs(target - lastTimeRef.current) < 0.033) return;
+    lastTimeRef.current = target;
+    video.currentTime   = target;
   });
 
+  // ── Overlay / text transforms ────────────────────────────────────────────
   const text1Opacity = useTransform(scrollYProgress, [0, 0.22, 0.32], [1, 1, 0]);
-  const text1Y = useTransform(scrollYProgress, [0, 0.08], [0, 0]);
 
   const text2Opacity = useTransform(scrollYProgress, [0.32, 0.42, 0.55, 0.65], [0, 1, 1, 0]);
-  const text2Y = useTransform(scrollYProgress, [0.32, 0.42], [30, 0]);
+  const text2Y       = useTransform(scrollYProgress, [0.32, 0.42], [28, 0]);
 
   const text3Opacity = useTransform(scrollYProgress, [0.65, 0.74, 0.88, 0.97], [0, 1, 1, 0]);
-  const text3Y = useTransform(scrollYProgress, [0.65, 0.74], [30, 0]);
+  const text3Y       = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
 
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0.6, 0.35, 0.35, 0.7]);
+  const overlayOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.05, 0.9, 1],
+    [0.5, 0.26, 0.26, 0.6]
+  );
 
   return (
     <div ref={containerRef} className="h-[400vh] w-full relative">
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-background">
+      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-background">
+
+        {/* ── Video — covers viewport, no black bars ───────────────────── */}
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/ramen.mp4"
+          src="/1000256540.mp4"
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover" }}
           muted
           playsInline
+          loop={false}
           preload="auto"
-          disablePictureInPicture
         />
 
+        {/* Scrim */}
         <motion.div
           className="absolute inset-0 z-10 bg-black"
           style={{ opacity: overlayOpacity }}
         />
 
-        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+        {/* ── Text overlays ────────────────────────────────────────────── */}
+        <div className="absolute inset-0 z-20 pointer-events-none">
+
+          {/* Phase 1 */}
           <motion.div
-            style={{ opacity: text1Opacity, y: text1Y }}
+            style={{ opacity: text1Opacity }}
             className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center"
           >
-            <p className="font-sans text-xs tracking-[0.5em] text-primary mb-4 uppercase">서울 탄생</p>
+            <p className="font-sans text-xs tracking-[0.5em] text-primary mb-4 uppercase">
+              서울 탄생
+            </p>
             <h1 className="font-display text-7xl md:text-[10rem] text-foreground leading-none tracking-tight drop-shadow-2xl">
               SLURP<br />IT HOT
             </h1>
           </motion.div>
 
+          {/* Phase 2 */}
           <motion.div
             style={{ opacity: text2Opacity, y: text2Y }}
             className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center"
           >
-            <p className="font-sans text-xs tracking-[0.5em] text-secondary mb-4 uppercase">고추장 블리스</p>
+            <p className="font-sans text-xs tracking-[0.5em] text-secondary mb-4 uppercase">
+              고추장 블리스
+            </p>
             <h1
               className="font-display text-6xl md:text-[9rem] leading-none tracking-tight drop-shadow-2xl"
-              style={{ color: "hsl(var(--primary))", textShadow: "0 0 60px hsl(var(--primary) / 0.5)" }}
+              style={{
+                color: "hsl(var(--primary))",
+                textShadow: "0 0 60px hsl(var(--primary) / 0.5)",
+              }}
             >
               SPICY<br />GOCHUJANG<br />BLISS
             </h1>
           </motion.div>
 
+          {/* Phase 3 */}
           <motion.div
             style={{ opacity: text3Opacity, y: text3Y }}
             className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center"
           >
-            <p className="font-sans text-xs tracking-[0.5em] text-foreground/60 mb-4 uppercase">대한민국</p>
+            <p className="font-sans text-[10px] tracking-[0.5em] text-foreground/50 mb-4 uppercase">
+              대한민국
+            </p>
             <h1 className="font-display text-7xl md:text-[10rem] text-foreground leading-none tracking-tight drop-shadow-2xl">
               BORN<br />IN SEOUL
             </h1>
           </motion.div>
         </div>
 
+        {/* Scroll cue */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none">
           <motion.p
             className="font-sans text-[10px] tracking-[0.4em] text-foreground/40 uppercase"
