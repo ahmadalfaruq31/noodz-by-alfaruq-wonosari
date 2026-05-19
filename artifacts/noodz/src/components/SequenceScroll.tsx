@@ -78,6 +78,11 @@ export default function SequenceScroll() {
   const text3Y         = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [0.48, 0.25, 0.25, 0.58]);
 
+  // Exit transition — cinematic fade-to-black + blur that kicks in as text3 fades out
+  const exitOpacity = useTransform(scrollYProgress, [0.78, 1.0], [0, 1]);
+  const exitBlurPx  = useTransform(scrollYProgress, [0.78, 0.96], [0, 18]);
+  const exitBlur    = useTransform(exitBlurPx, (v) => `blur(${v.toFixed(2)}px)`);
+
   // ── Canvas resize ─────────────────────────────────────────────────────────
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
@@ -191,7 +196,7 @@ export default function SequenceScroll() {
           }}
         />
 
-        {/* Scrim — Framer Motion owns only this element's opacity */}
+        {/* Scrim — subtle mid-scroll darkening for text readability */}
         <motion.div
           style={{
             position: "absolute",
@@ -202,8 +207,22 @@ export default function SequenceScroll() {
           }}
         />
 
-        {/* Text overlays — above canvas and scrim */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}>
+        {/* Exit overlay — cinematic fade-to-black + backdrop blur as sequence ends */}
+        <motion.div
+          style={{
+            position:       "absolute",
+            inset:          0,
+            zIndex:         3,
+            background:     "#000000",
+            opacity:        exitOpacity,
+            backdropFilter: exitBlur,
+            WebkitBackdropFilter: exitBlur,
+            pointerEvents:  "none",
+          }}
+        />
+
+        {/* Text overlays — above canvas, scrim, and exit overlay */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
 
           {/* Phase 1 — SLURP IT HOT */}
           <motion.div
