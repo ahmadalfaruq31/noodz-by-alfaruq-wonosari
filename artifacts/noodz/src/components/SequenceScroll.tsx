@@ -78,6 +78,12 @@ export default function SequenceScroll() {
   const text3Y         = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [0.48, 0.25, 0.25, 0.58]);
 
+  // Cinematic blur-to-black overlay — triggered exactly when Phase 3 / "Every bowl…" fades in.
+  // Eases from fully transparent to bg-black/90 + 12px blur over the same range as text3's entrance.
+  const cineBlackOpacity = useTransform(scrollYProgress, [0.65, 0.84], [0, 0.9]);
+  const cineBlurRaw      = useTransform(scrollYProgress, [0.65, 0.84], [0, 12]);
+  const cineBlurFilter   = useTransform(cineBlurRaw, (v) => `blur(${v.toFixed(2)}px)`);
+
   // ── Canvas resize ─────────────────────────────────────────────────────────
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
@@ -202,8 +208,28 @@ export default function SequenceScroll() {
           }}
         />
 
-        {/* Text overlays — above canvas and scrim */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}>
+        {/*
+          Cinematic blur-to-black overlay — sits above scrim, below text.
+          Triggers exactly when "Every bowl of Noodz…" / Phase 3 fades in.
+          Interpolates backdrop-blur 0→12px AND bg-black opacity 0→0.9
+          over the same scroll range as text3's entrance for a perfectly
+          synchronized, organic transition with no hard cuts.
+        */}
+        <motion.div
+          style={{
+            position:            "absolute",
+            inset:               0,
+            zIndex:              3,
+            background:          "#000000",
+            opacity:             cineBlackOpacity,
+            backdropFilter:      cineBlurFilter,
+            WebkitBackdropFilter: cineBlurFilter,
+            pointerEvents:       "none",
+          }}
+        />
+
+        {/* Text overlays — above canvas, scrim, and cinematic overlay */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
 
           {/* Phase 1 — SLURP IT HOT */}
           <motion.div
@@ -234,7 +260,7 @@ export default function SequenceScroll() {
             </h1>
           </motion.div>
 
-          {/* Phase 3 — BORN IN SEOUL */}
+          {/* Phase 3 — BORN IN SEOUL + "Every bowl of Noodz…" */}
           <motion.div
             style={{ opacity: text3Opacity, y: text3Y }}
             className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center"
@@ -245,6 +271,9 @@ export default function SequenceScroll() {
             <h1 className="font-display text-7xl md:text-[10rem] text-foreground leading-none tracking-tight drop-shadow-2xl">
               BORN<br />IN SEOUL
             </h1>
+            <p className="font-sans text-sm md:text-base text-foreground/70 mt-6 max-w-sm leading-relaxed">
+              Every bowl of Noodz is a story — fire, soul, and 36 hours of broth.
+            </p>
           </motion.div>
         </div>
 
