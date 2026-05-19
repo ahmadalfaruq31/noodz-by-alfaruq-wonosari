@@ -1,45 +1,48 @@
-# [Project name]
+# Noodz — K-Ramen Scrolltelling Landing Page
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A high-end, Awwwards-level scrolltelling landing page for "Noodz," a trendy Korean ramen brand. Features scroll-linked gradient animations, bold bilingual typography, and a cyberpunk-meets-Korean-street-food aesthetic.
 
 ## Run & Operate
 
+- `pnpm --filter @workspace/noodz run dev` — run the frontend (port assigned via workflow)
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React + Vite, Tailwind CSS v4
+- Animation: Motion (motion/react) — scroll-linked gradients, word reveals, count-up
+- Smooth Scroll: Lenis
+- UI: shadcn/ui components
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/noodz/` — the landing page frontend
+- `artifacts/noodz/src/pages/Home.tsx` — main page assembly
+- `artifacts/noodz/src/components/` — all section components
+  - `Navbar.tsx` — fullscreen overlay menu with bilingual hover effects
+  - `VideoScroll.tsx` — 400vh sticky scroll hero with animated gradients
+  - `AboutSection.tsx` — word-by-word scroll reveal text
+  - `MenuGrid.tsx` — bento grid with gradient cards and neon hover borders
+  - `StatsSection.tsx` — count-up animated stats
+  - `TestimonialsSection.tsx` — autoplay fullscreen testimonial slider
+  - `CTASection.tsx` — pulsing neon CTA
+  - `Footer.tsx` — social links and brand footer
+- `artifacts/noodz/src/index.css` — brand palette (Gochujang Red, Spicy Orange, Sesame Cream, Charcoal Black), Bebas Neue + Space Grotesk fonts
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Presentation-first app (no backend) — all data is static/hardcoded
+- Lenis initialized in App.tsx via useEffect for smooth scroll integration with Motion
+- VideoScroll uses h-[400vh] container with sticky inner div; subsequent sections use -mt-[100vh] z-10 to overlap the hero
+- Gradient animation simulates steamy ramen video since no actual video file exists
+- Motion's useScroll + useTransform used throughout for scroll-linked animations
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+A single-page scrolltelling experience for the Noodz K-Ramen brand. Sections: fullscreen animated hero, "Our Broth" word-reveal, bento menu grid, animated stats, testimonials slider, "Order Now" CTA, and footer.
 
 ## User preferences
 
 _Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
