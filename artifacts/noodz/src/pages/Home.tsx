@@ -9,10 +9,31 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main className="w-full bg-background text-foreground overflow-hidden">
+    // No overflow-hidden here — it can clip fixed children in some browsers
+    <main
+      style={{
+        width: "100%",
+        margin: 0,
+        padding: 0,
+        background: "#000000",
+        color: "hsl(var(--foreground))",
+        overflowX: "hidden",
+      }}
+    >
       <Navbar />
+
+      {/* Hero: 400vh scroll distance + fixed canvas overlay */}
       <SequenceScroll />
-      <div className="-mt-[100vh] relative z-10">
+
+      {/* Content sections — z-index 10 sits above the fixed canvas layer (z-index 1) */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          marginTop: "-100vh",
+          padding: 0,
+        }}
+      >
         <AboutSection />
         <MenuGrid />
         <StatsSection />

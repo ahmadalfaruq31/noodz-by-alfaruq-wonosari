@@ -2,73 +2,54 @@ import { useEffect, useRef, useCallback } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
-const TOTAL   = 240;
-const PAD     = 3;
-const BASE    = "/sequence/ezgif-frame-";
-const EXT     = ".jpg";
+const TOTAL = 240;
+const BASE  = "/sequence/ezgif-frame-";
 
-function src(i: number) {
-  return `${BASE}${String(i).padStart(PAD, "0")}${EXT}`;
+function frameSrc(i: number) {
+  return `${BASE}${String(i + 1).padStart(3, "0")}.jpg`;
 }
 
-// ─── Object-fit COVER via source-crop ────────────────────────────────────────
-// Uses the 9-argument drawImage so the browser blits only the visible portion
-// of the source image, filling the canvas exactly — zero black bars on any
-// screen size or orientation.
+// ─── Exact cover math (user-specified) ───────────────────────────────────────
 function drawCover(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
-  cw: number,   // canvas pixel width  (device pixels)
-  ch: number    // canvas pixel height (device pixels)
+  cw: number,
+  ch: number,
 ) {
-  const iw = img.naturalWidth;
-  const ih = img.naturalHeight;
-  if (!iw || !ih) return;
+  if (!img.naturalWidth || !img.naturalHeight) return;
 
-  // Scale so the image covers the canvas (same math as object-fit:cover)
-  const scale = Math.max(cw / iw, ch / ih);
+  const imageRatio  = img.width  / img.height;
+  const canvasRatio = cw / ch;
+  let sX: number, sY: number, sWidth: number, sHeight: number;
 
-  // Scaled image dimensions
-  const sw = iw * scale;
-  const sh = ih * scale;
-
-  // Where the image would sit if centred over the canvas
-  const ox = (cw - sw) / 2;
-  const oy = (ch - sh) / 2;
-
-  ctx.clearRect(0, 0, cw, ch);
-
-  // If the scaled image is exactly the canvas size, skip the 9-arg form
-  if (ox === 0 && oy === 0) {
-    ctx.drawImage(img, 0, 0, cw, ch);
-    return;
+  if (canvasRatio > imageRatio) {
+    sWidth  = img.width;
+    sHeight = img.width / canvasRatio;
+    sX      = 0;
+    sY      = (img.height - sHeight) / 2;
+  } else {
+    sWidth  = img.height * canvasRatio;
+    sHeight = img.height;
+    sX      = (img.width - sWidth) / 2;
+    sY      = 0;
   }
 
-  // Source crop: which rectangle of the original image maps to the full canvas
-  const srcX = -ox / scale;
-  const srcY = -oy / scale;
-  const srcW =  cw  / scale;
-  const srcH =  ch  / scale;
-
-  ctx.drawImage(
-    img,
-    srcX, srcY, srcW, srcH,   // source crop
-    0,    0,    cw,   ch      // destination = full canvas
-  );
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, cw, ch);
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function SequenceScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
+  // Plain div ref — no Framer Motion style ownership, DOM mutations work reliably
+  const wrapRef      = useRef<HTMLDivElement>(null);
 
-  // Image store — plain refs, never trigger re-renders
-  const imgs    = useRef<HTMLImageElement[]>(new Array(TOTAL));
-  const ready   = useRef<boolean[]>(new Array(TOTAL).fill(false));
+  const imgs  = useRef<HTMLImageElement[]>(new Array(TOTAL));
+  const ready = useRef<boolean[]>(new Array(TOTAL).fill(false));
 
-  // Render state
-  const target    = useRef(0);   // desired frame index (0-based)
-  const drawn     = useRef(-1);  // last frame actually painted
+  const target    = useRef(0);
+  const drawn     = useRef(-1);
   const rafHandle = useRef<number | null>(null);
 
   // ── Scroll ────────────────────────────────────────────────────────────────
@@ -81,143 +62,148 @@ export default function SequenceScroll() {
     target.current = Math.min(TOTAL - 1, Math.max(0, Math.round(p * (TOTAL - 1))));
   });
 
-  // ── Canvas resize — ONLY sets pixel dimensions, NO ctx transforms ─────────
+  // Hero fade-out: becomes invisible after 92% of scroll so sections cover it cleanly
+  const heroFade   = useTransform(scrollYProgress, [0.92, 1], [1, 0]);
+
+  // Direct DOM update for hero opacity — no React re-renders, no Motion ownership
+  useMotionValueEvent(heroFade, "change", (v) => {
+    if (wrapRef.current) wrapRef.current.style.opacity = String(v);
+  });
+
+  // Text/scrim transforms
+  const text1Opacity   = useTransform(scrollYProgress, [0,    0.22, 0.32], [1, 1, 0]);
+  const text2Opacity   = useTransform(scrollYProgress, [0.32, 0.42, 0.55, 0.65], [0, 1, 1, 0]);
+  const text2Y         = useTransform(scrollYProgress, [0.32, 0.42], [28, 0]);
+  const text3Opacity   = useTransform(scrollYProgress, [0.65, 0.74, 0.88, 0.97], [0, 1, 1, 0]);
+  const text3Y         = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [0.48, 0.25, 0.25, 0.58]);
+
+  // ── Canvas resize ─────────────────────────────────────────────────────────
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dpr = window.devicePixelRatio || 1;
-    // Assigning width/height resets the canvas AND clears all previous
-    // transforms — safe to do here without accumulation risk.
-    canvas.width  = Math.round(canvas.offsetWidth  * dpr);
-    canvas.height = Math.round(canvas.offsetHeight * dpr);
-    drawn.current = -1; // force repaint after resize
+    // Assigning .width/.height resets the 2D context to identity — safe, no accumulation
+    canvas.width  = Math.round(window.innerWidth  * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    drawn.current = -1;
   }, []);
 
-  // ── Paint loop — runs every rAF, repaints only when necessary ─────────────
+  // ── RAF paint loop — all refs, zero React state, one allocation at mount ──
   const loop = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) { rafHandle.current = requestAnimationFrame(loop); return; }
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        const want = target.current;
+        if (want !== drawn.current) {
+          let idx   = want;
+          let found = ready.current[idx];
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx)  { rafHandle.current = requestAnimationFrame(loop); return; }
+          if (!found) {
+            for (let d = 1; d < TOTAL; d++) {
+              if (idx - d >= 0    && ready.current[idx - d]) { idx = idx - d; found = true; break; }
+              if (idx + d < TOTAL && ready.current[idx + d]) { idx = idx + d; found = true; break; }
+            }
+          }
 
-    const want = target.current;
-
-    if (want !== drawn.current) {
-      // Find best available frame — target first, then search outward
-      let idx = want;
-
-      if (!ready.current[idx]) {
-        let found = false;
-        for (let d = 1; d < TOTAL; d++) {
-          const lo = idx - d;
-          const hi = idx + d;
-          if (lo >= 0    && ready.current[lo]) { idx = lo; found = true; break; }
-          if (hi < TOTAL && ready.current[hi]) { idx = hi; found = true; break; }
-        }
-        if (!found) {
-          rafHandle.current = requestAnimationFrame(loop);
-          return; // nothing loaded yet — keep canvas as-is (background colour)
+          if (found) {
+            drawCover(ctx, imgs.current[idx], canvas.width, canvas.height);
+            drawn.current = want;
+          }
         }
       }
-
-      drawCover(ctx, imgs.current[idx], canvas.width, canvas.height);
-      drawn.current = want; // record intent, not the fallback idx
     }
-
     rafHandle.current = requestAnimationFrame(loop);
-  }, []);
+  }, []); // stable — only refs inside
 
   // ── Mount / unmount ───────────────────────────────────────────────────────
   useEffect(() => {
-    // Initial size
     resize();
-
-    // Watch for viewport changes (orientation, resize, mobile URL-bar)
-    const ro = new ResizeObserver(resize);
-    if (canvasRef.current) ro.observe(canvasRef.current);
-
-    // Start render loop
+    window.addEventListener("resize",            resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
     rafHandle.current = requestAnimationFrame(loop);
 
-    // ── Preload all 240 images ────────────────────────────────────────────
-    // Frame 0 is loaded first (synchronously queued) so it renders fast;
-    // the rest are loaded in order via a queue to avoid memory spikes.
     const store   = imgs.current;
     const isReady = ready.current;
 
     function loadOne(i: number) {
-      const img   = new Image();
+      const img    = new Image();
       img.decoding = "async";
-      img.onload  = () => {
-        isReady[i] = true;
-        // Force repaint when any early frame loads
-        if (drawn.current < 0) drawn.current = -1;
-      };
-      img.src     = src(i + 1);   // files are 1-indexed
-      store[i]    = img;
+      img.onload   = () => { isReady[i] = true; };
+      img.src      = frameSrc(i);
+      store[i]     = img;
     }
 
-    // Load first frame immediately
     loadOne(0);
 
-    // Queue the rest in a microtask to not block first paint
     let queued = 1;
-    const next = () => {
+    function scheduleNext() {
       if (queued >= TOTAL) return;
-      loadOne(queued);
-      queued++;
-      // Use MessageChannel (faster than setTimeout 0) to yield to the browser
+      loadOne(queued++);
       const mc = new MessageChannel();
-      mc.port1.onmessage = next;
+      mc.port1.onmessage = scheduleNext;
       mc.port2.postMessage(null);
-    };
-    // Start queuing after first frame request finishes
+    }
     const mc = new MessageChannel();
-    mc.port1.onmessage = next;
+    mc.port1.onmessage = scheduleNext;
     mc.port2.postMessage(null);
 
     return () => {
-      ro.disconnect();
+      window.removeEventListener("resize",            resize);
+      window.removeEventListener("orientationchange", resize);
       if (rafHandle.current !== null) cancelAnimationFrame(rafHandle.current);
     };
   }, [loop, resize]);
 
-  // ── Text / overlay motion values ──────────────────────────────────────────
-  const text1Opacity   = useTransform(scrollYProgress, [0, 0.22, 0.32], [1, 1, 0]);
-
-  const text2Opacity   = useTransform(scrollYProgress, [0.32, 0.42, 0.55, 0.65], [0, 1, 1, 0]);
-  const text2Y         = useTransform(scrollYProgress, [0.32, 0.42], [28, 0]);
-
-  const text3Opacity   = useTransform(scrollYProgress, [0.65, 0.74, 0.88, 0.97], [0, 1, 1, 0]);
-  const text3Y         = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
-
-  const overlayOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.05, 0.9, 1],
-    [0.5, 0.26, 0.26, 0.6]
-  );
-
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div ref={containerRef} className="h-[400vh] w-full relative">
-      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-background">
+    // Scroll-distance anchor — transparent, no visual
+    <div ref={containerRef} style={{ height: "400vh", width: "100%", position: "relative" }}>
 
-        {/* Canvas — pixel dimensions set in JS, CSS just stretches it to fill */}
+      {/*
+        Plain div (NOT motion.div) — we mutate style.opacity directly via
+        useMotionValueEvent so Framer Motion never owns this element's styles.
+        Fixed to exact viewport bounds: no margins, no CSS h-screen quirks.
+      */}
+      <div
+        ref={wrapRef}
+        style={{
+          position:   "fixed",
+          top:        0,
+          left:       0,
+          width:      "100vw",
+          height:     "100vh",
+          zIndex:     1,
+          overflow:   "hidden",
+          background: "#000000",
+          opacity:    1,
+        }}
+      >
+        {/* Canvas — pixel dims set by JS; CSS fills the wrapper exactly */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-          style={{ display: "block" }}
+          style={{
+            position: "absolute",
+            top: 0, left: 0,
+            width: "100%", height: "100%",
+            display: "block",
+          }}
         />
 
-        {/* Scrim — keeps text readable over any frame */}
+        {/* Scrim — Framer Motion owns only this element's opacity */}
         <motion.div
-          className="absolute inset-0 z-10 bg-black"
-          style={{ opacity: overlayOpacity }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            background: "#000000",
+            opacity: overlayOpacity,
+          }}
         />
 
-        {/* Text overlays */}
-        <div className="absolute inset-0 z-20 pointer-events-none">
+        {/* Text overlays — above canvas and scrim */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}>
 
           {/* Phase 1 — SLURP IT HOT */}
           <motion.div
@@ -242,10 +228,7 @@ export default function SequenceScroll() {
             </p>
             <h1
               className="font-display text-6xl md:text-[9rem] leading-none tracking-tight drop-shadow-2xl"
-              style={{
-                color: "hsl(var(--primary))",
-                textShadow: "0 0 60px hsl(var(--primary) / 0.5)",
-              }}
+              style={{ color: "hsl(var(--primary))", textShadow: "0 0 60px hsl(var(--primary) / 0.5)" }}
             >
               SPICY<br />GOCHUJANG<br />BLISS
             </h1>
@@ -266,7 +249,16 @@ export default function SequenceScroll() {
         </div>
 
         {/* Scroll cue */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none">
+        <div
+          style={{
+            position: "absolute",
+            bottom: 32, left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 4,
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+            pointerEvents: "none",
+          }}
+        >
           <motion.p
             className="font-sans text-[10px] tracking-[0.4em] text-foreground/40 uppercase"
             animate={{ opacity: [0.4, 0.9, 0.4] }}
