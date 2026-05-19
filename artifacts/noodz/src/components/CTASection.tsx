@@ -65,13 +65,17 @@ export default function CTASection() {
           viewport={{ once: true }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          <motion.button
+          <motion.a
+            href="https://wa.me/6281390348478"
+            target="_blank"
+            rel="noopener noreferrer"
             data-testid="button-order-now"
-            className="relative inline-flex items-center gap-3 font-display text-2xl md:text-3xl px-12 py-5 overflow-hidden group"
+            className="relative inline-flex items-center gap-3 font-display text-2xl md:text-3xl px-12 py-5 overflow-hidden group cursor-pointer"
             style={{
               background: "hsl(var(--primary))",
               color: "hsl(var(--primary-foreground))",
               clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px))",
+              textDecoration: "none",
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
@@ -82,7 +86,7 @@ export default function CTASection() {
             />
             <span className="relative z-10">ORDER NOW</span>
             <span className="relative z-10 text-lg opacity-70">→</span>
-          </motion.button>
+          </motion.a>
         </motion.div>
 
         <motion.p

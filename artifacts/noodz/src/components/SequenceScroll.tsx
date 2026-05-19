@@ -78,10 +78,10 @@ export default function SequenceScroll() {
   const text3Y         = useTransform(scrollYProgress, [0.65, 0.74], [28, 0]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [0.48, 0.25, 0.25, 0.58]);
 
-  // Cinematic blur-to-black overlay — triggered exactly when Phase 3 / "Every bowl…" fades in.
-  // Eases from fully transparent to bg-black/90 + 12px blur over the same range as text3's entrance.
-  const cineBlackOpacity = useTransform(scrollYProgress, [0.65, 0.84], [0, 0.9]);
-  const cineBlurRaw      = useTransform(scrollYProgress, [0.65, 0.84], [0, 12]);
+  // Cinematic overlay — starts fully transparent when Phase 3 / subtitle enters,
+  // then builds slowly and organically to blurred-black across a long scroll window.
+  const cineBlackOpacity = useTransform(scrollYProgress, [0.65, 0.72, 0.97], [0, 0, 0.88]);
+  const cineBlurRaw      = useTransform(scrollYProgress, [0.65, 0.72, 0.97], [0, 0, 16]);
   const cineBlurFilter   = useTransform(cineBlurRaw, (v) => `blur(${v.toFixed(2)}px)`);
 
   // ── Canvas resize ─────────────────────────────────────────────────────────
@@ -272,7 +272,7 @@ export default function SequenceScroll() {
               BORN<br />IN SEOUL
             </h1>
             <p className="font-sans text-sm md:text-base text-foreground/70 mt-6 max-w-sm leading-relaxed">
-              Every bowl of Noodz is a story — fire, soul, and 36 hours of broth.
+              Setiap mangkuk Noodz adalah sebuah cerita — api, jiwa, dan 36 jam kuah yang penuh cinta.
             </p>
           </motion.div>
         </div>

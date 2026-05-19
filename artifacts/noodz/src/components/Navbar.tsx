@@ -15,7 +15,10 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center pointer-events-none mix-blend-difference text-foreground">
-        <div className="font-display text-4xl tracking-wider text-primary font-bold pointer-events-auto cursor-pointer">NOODZ</div>
+        <div className="font-display text-4xl tracking-wider text-primary font-bold pointer-events-auto cursor-pointer leading-none">
+          NOODZ
+          <span className="block font-sans text-[10px] tracking-[0.3em] text-foreground/50 font-normal uppercase mt-0.5">by Alfaruq</span>
+        </div>
         <button 
           onClick={() => setIsOpen(true)}
           className="pointer-events-auto p-2 bg-transparent text-foreground hover:text-primary transition-colors"
