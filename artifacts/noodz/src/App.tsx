@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import NotFound from "@/pages/not-found";
 import GrainOverlay from "@/components/GrainOverlay";
 import CustomCursor from "@/components/CustomCursor";
+import SplashScreen from "@/components/SplashScreen";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Router />
       </WouterRouter>
       <Toaster />
+      <SplashScreen />
       <GrainOverlay />
       <CustomCursor />
     </TooltipProvider>
