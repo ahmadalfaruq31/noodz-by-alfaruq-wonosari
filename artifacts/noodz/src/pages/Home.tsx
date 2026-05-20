@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import SequenceScroll from "@/components/SequenceScroll";
 import AboutSection from "@/components/AboutSection";
 import MenuGrid from "@/components/MenuGrid";
+import HowToOrder from "@/components/HowToOrder";
 import StatsSection from "@/components/StatsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
@@ -9,7 +10,6 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    // No overflow-hidden here — it can clip fixed children in some browsers
     <main
       style={{
         width: "100%",
@@ -36,6 +36,7 @@ export default function Home() {
       >
         <AboutSection />
         <MenuGrid />
+        <HowToOrder />
         <StatsSection />
         <TestimonialsSection />
         <CTASection />
