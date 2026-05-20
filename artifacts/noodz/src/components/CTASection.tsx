@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export default function CTASection() {
   return (
-    <section className="relative py-40 px-6 md:px-16 flex flex-col items-center justify-center text-center overflow-hidden bg-background">
+    <section id="order" className="relative py-40 px-6 md:px-16 flex flex-col items-center justify-center text-center overflow-hidden bg-background">
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
           className="absolute rounded-full"

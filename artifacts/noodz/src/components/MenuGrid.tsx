@@ -53,7 +53,7 @@ const menuItems = [
 
 export default function MenuGrid() {
   return (
-    <section className="bg-card py-24 px-6 md:px-16">
+    <section id="menu" className="bg-card py-24 px-6 md:px-16">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4">
           <div>

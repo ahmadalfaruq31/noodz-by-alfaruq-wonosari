@@ -15,7 +15,7 @@ export default function AboutSection() {
   });
 
   return (
-    <section
+    <section id="story"
       ref={containerRef}
       className="relative bg-background py-32 px-6 md:px-16 min-h-screen flex flex-col justify-center overflow-hidden"
     >

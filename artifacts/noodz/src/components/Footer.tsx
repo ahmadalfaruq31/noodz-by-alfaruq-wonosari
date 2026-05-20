@@ -9,7 +9,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative bg-card border-t border-border py-16 px-6 md:px-16 overflow-hidden">
+    <footer id="outlet" className="relative bg-card border-t border-border py-16 px-6 md:px-16 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent)" }} />
 
       <div className="max-w-7xl mx-auto">
