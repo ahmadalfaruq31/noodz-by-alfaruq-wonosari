@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 
 const BROTH_TEXT =
-  "Every bowl of Noodz starts with a 24-hour broth — slow-simmered bones, gochujang fire, and enough soul to make Seoul jealous.";
+  "Setiap mangkuk Noodz dimulai dari kuah 24 jam — tulang direbus perlahan, api gochujang, dan jiwa yang cukup untuk membuat Seoul iri.";
 
 const words = BROTH_TEXT.split(" ");
 
@@ -38,7 +38,7 @@ export default function AboutSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          OUR BROTH / 우리의 국물
+          KUAH KAMI / 우리의 국물
         </motion.p>
 
         <div className="flex flex-wrap gap-x-4 gap-y-2">
@@ -59,9 +59,9 @@ export default function AboutSection() {
 
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { label: "HAND-PULLED NOODLES", sub: "손으로 뽑은 면", desc: "Made fresh every morning from our proprietary wheat blend." },
-            { label: "24H SLOW BROTH", sub: "24시간 브로스", desc: "Pork & chicken bones, gochugaru, doenjang. No shortcuts." },
-            { label: "FIERY SOUL", sub: "매운 영혼", desc: "Every bowl is a love letter to the streets of Seoul." },
+            { label: "MIE HAND-PULLED", sub: "손으로 뽑은 면", desc: "Dibuat segar setiap pagi dari campuran terigu eksklusif kami." },
+            { label: "KUAH LAMBAT 24 JAM", sub: "24시간 브로스", desc: "Tulang babi & ayam, gochugaru, doenjang. Tanpa jalan pintas." },
+            { label: "JIWA MEMBARA", sub: "매운 영혼", desc: "Setiap mangkuk adalah surat cinta untuk jalanan Wonosari." },
           ].map((item, i) => (
             <motion.div
               key={item.label}

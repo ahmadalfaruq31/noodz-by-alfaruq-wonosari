@@ -3,7 +3,7 @@ import { SiInstagram, SiTiktok, SiX } from "react-icons/si";
 
 export default function Footer() {
   const socials = [
-    { icon: SiInstagram, label: "Instagram", href: "#" },
+    { icon: SiInstagram, label: "Instagram", href: "https://instagram.com/alllfrq_" },
     { icon: SiTiktok, label: "TikTok", href: "#" },
     { icon: SiX, label: "X (Twitter)", href: "#" },
   ];
@@ -15,22 +15,26 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
           <div>
-            <motion.p
-              className="font-display text-6xl md:text-8xl text-foreground mb-2 leading-none"
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              NOODZ
-            </motion.p>
+              <p className="font-display text-6xl md:text-8xl text-foreground leading-none">
+                NOODZ
+              </p>
+              <p className="font-sans text-sm tracking-[0.3em] text-primary/80 font-normal uppercase mt-1">
+                by Alfaruq
+              </p>
+            </motion.div>
             <motion.p
-              className="font-sans text-xs tracking-[0.3em] text-primary"
+              className="font-sans text-xs tracking-[0.3em] text-muted-foreground mt-3"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              BORN SPICY. SERVED HOT. — 서울에서 탄생
+              LAHIR PEDAS. DISAJIKAN PANAS. — Wonosari, Jogja
             </motion.p>
           </div>
 
@@ -40,6 +44,8 @@ export default function Footer() {
                 <motion.a
                   key={s.label}
                   href={s.href}
+                  target={s.href !== "#" ? "_blank" : undefined}
+                  rel={s.href !== "#" ? "noopener noreferrer" : undefined}
                   data-testid={`link-social-${s.label.toLowerCase()}`}
                   aria-label={s.label}
                   className="text-muted-foreground hover:text-primary transition-colors duration-300"
@@ -55,7 +61,7 @@ export default function Footer() {
             </div>
 
             <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {["Myeongdong, Seoul", "Itaewon, Seoul"].map((loc) => (
+              {["Wonosari, Jogja"].map((loc) => (
                 <p key={loc} className="font-sans text-xs text-muted-foreground tracking-widest uppercase">{loc}</p>
               ))}
             </div>
@@ -64,10 +70,10 @@ export default function Footer() {
 
         <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row justify-between gap-4">
           <p className="font-sans text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Noodz. All rights reserved.
+            &copy; {new Date().getFullYear()} Noodz by Alfaruq. Hak cipta dilindungi.
           </p>
           <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service"].map((link) => (
+            {["Kebijakan Privasi", "Syarat Layanan"].map((link) => (
               <a
                 key={link}
                 href="#"

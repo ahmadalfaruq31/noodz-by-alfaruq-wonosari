@@ -4,48 +4,48 @@ const menuItems = [
   {
     name: "Spicy Buldak Ramen",
     kor: "불닭 라멘",
-    price: "$16",
-    desc: "Fire chicken broth, chewy noodles, charred scallions",
+    price: "Rp 45.000",
+    desc: "Kuah ayam bakar pedas, mie kenyal, daun bawang gosong",
     gradient: "radial-gradient(circle at 30% 40%, #E63946 0%, #D90429 50%, #1A1A1A 100%)",
     span: "md:col-span-2 md:row-span-2",
   },
   {
     name: "Cheesy Kimchi Noodz",
     kor: "치즈 김치 면",
-    price: "$14",
-    desc: "Aged kimchi, melted gruyère, sesame crunch",
+    price: "Rp 40.000",
+    desc: "Kimchi matang, keju gruyère leleh, taburan wijen renyah",
     gradient: "radial-gradient(circle at 60% 30%, #F77F00 0%, #E63946 60%, #1A1A1A 100%)",
     span: "",
   },
   {
     name: "Volcano Egg Top",
     kor: "화산 에그 탑",
-    price: "$4",
-    desc: "Add-on: runny ramen egg, chili oil drizzle",
+    price: "Rp 12.000",
+    desc: "Tambahan: telur ramen setengah matang, siraman minyak cabai",
     gradient: "radial-gradient(circle at 50% 70%, #FAEDCD 0%, #F77F00 50%, #D90429 100%)",
     span: "",
   },
   {
     name: "Garlic Bomb Broth",
     kor: "마늘 폭탄 브로스",
-    price: "$15",
-    desc: "Toasted black garlic, tonkotsu base, crispy shallots",
+    price: "Rp 42.000",
+    desc: "Bawang putih hitam panggang, base tonkotsu, bawang goreng renyah",
     gradient: "radial-gradient(circle at 40% 50%, #2D1B00 0%, #F77F00 60%, #1A1A1A 100%)",
     span: "",
   },
   {
     name: "K-BBQ Gyoza Side",
     kor: "케이비비큐 교자",
-    price: "$9",
-    desc: "Pan-fried pork & kimchi dumplings, ponzu dip",
+    price: "Rp 28.000",
+    desc: "Gyoza babi & kimchi goreng, celupan ponzu",
     gradient: "radial-gradient(circle at 70% 30%, #D90429 0%, #8B0000 50%, #1A1A1A 100%)",
     span: "",
   },
   {
     name: "Midnight Ramyun",
     kor: "미드나잇 라면",
-    price: "$13",
-    desc: "Spicy gochujang, silken tofu, roasted sesame",
+    price: "Rp 38.000",
+    desc: "Gochujang pedas, tahu sutra, wijen panggang",
     gradient: "radial-gradient(circle at 20% 80%, #FF6B35 0%, #E63946 40%, #0D0D0D 100%)",
     span: "md:col-span-2",
   },
@@ -63,7 +63,7 @@ export default function MenuGrid() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              THE MENU / 메뉴
+              MENU KAMI / 메뉴
             </motion.p>
             <motion.h2
               className="font-display text-6xl md:text-8xl text-foreground"
@@ -72,8 +72,8 @@ export default function MenuGrid() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              CHOOSE YOUR<br />
-              <span className="text-primary">HEAT LEVEL</span>
+              PILIH LEVEL<br />
+              <span className="text-primary">PEDASMU</span>
             </motion.h2>
           </div>
           <motion.p
@@ -83,7 +83,7 @@ export default function MenuGrid() {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            All bowls crafted in Seoul style. No mild options — we don't do lukewarm.
+            Semua mangkuk dibuat ala Seoul. Tidak ada opsi biasa — kami tidak kenal setengah-setengah.
           </motion.p>
         </div>
 

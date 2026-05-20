@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 
 const stats = [
-  { value: 10000, suffix: "+", label: "Bowls Slurped", kor: "슬러프된 그릇" },
-  { value: 9, suffix: "", label: "Scoville Level", kor: "스코빌 레벨" },
-  { value: 24, suffix: "H", label: "Broth Simmered", kor: "브로스 시머" },
-  { value: 2, suffix: "", label: "Seoul Locations", kor: "서울 매장" },
+  { value: 10000, suffix: "+", label: "Mangkuk Tersruput", kor: "슬러프된 그릇" },
+  { value: 9, suffix: "", label: "Level Scoville", kor: "스코빌 레벨" },
+  { value: 24, suffix: "J", label: "Jam Kuah Dimasak", kor: "브로스 시머" },
+  { value: 1, suffix: "", label: "Lokasi di Jogja", kor: "족자 매장" },
 ];
 
 function CountUp({
@@ -72,7 +72,7 @@ export default function StatsSection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          BY THE NUMBERS / 숫자로 보다
+          DALAM ANGKA / 숫자로 보다
         </motion.p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-border">

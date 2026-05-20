@@ -36,7 +36,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          READY TO BURN / 준비됐어?
+          SIAP KEPEDASAN? / 준비됐어?
         </motion.p>
 
         <motion.h2
@@ -46,7 +46,7 @@ export default function CTASection() {
           viewport={{ once: true }}
           transition={{ delay: 0.1, duration: 0.8 }}
         >
-          ORDER
+          PESAN
         </motion.h2>
 
         <motion.h2
@@ -56,7 +56,7 @@ export default function CTASection() {
           viewport={{ once: true }}
           transition={{ delay: 0.2, duration: 0.8 }}
         >
-          지금 주문
+          SEKARANG
         </motion.h2>
 
         <motion.div
@@ -96,7 +96,7 @@ export default function CTASection() {
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
         >
-          PICKUP & DELIVERY — OPEN DAILY 11AM–2AM
+          PICKUP & DELIVERY — BUKA SETIAP HARI 11.00–02.00 WIB
         </motion.p>
       </div>
     </section>

@@ -4,27 +4,27 @@ import { motion, AnimatePresence } from "motion/react";
 const testimonials = [
   {
     quote:
-      "I've eaten ramen in Tokyo, New York, and London. Noodz hit different. That broth is pure soul in a bowl.",
+      "Saya sudah makan ramen di Tokyo, New York, dan London. Noodz beda levelnya. Kuahnya benar-benar jiwa dalam semangkuk.",
     name: "Minjun K.",
-    location: "Seoul, South Korea",
+    location: "Seoul, Korea Selatan",
   },
   {
     quote:
-      "The Buldak hit me like a K-drama plot twist — totally unexpected, deeply emotional, and I need more.",
+      "Buldak-nya nyerang kayak plot twist K-drama — sama sekali tidak terduga, bikin baper, dan mau lagi terus.",
     name: "Sora L.",
-    location: "Hong Kong",
+    location: "Yogyakarta, Indonesia",
   },
   {
     quote:
-      "It's not just food. It's a whole experience. The atmosphere, the spice, the noodle pull — chef's kiss.",
+      "Ini bukan sekadar makanan. Ini pengalaman utuh. Suasana, pedasnya, tarikan mie-nya — sempurna banget.",
     name: "Yuna P.",
-    location: "Los Angeles, USA",
+    location: "Jakarta, Indonesia",
   },
   {
     quote:
-      "Finally, ramen that doesn't apologize for being bold. Noodz is the future of Korean street food.",
+      "Akhirnya, ramen yang tidak tanggung-tanggung. Noodz adalah masa depan street food Korea di Jogja.",
     name: "Taeyang O.",
-    location: "London, UK",
+    location: "Wonosari, Jogja",
   },
 ];
 
@@ -61,7 +61,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          TESTIMONIALS / 후기
+          ULASAN PELANGGAN / 후기
         </motion.p>
 
         <div className="relative w-full max-w-4xl">
