@@ -1,10 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
+    // Detect touch device — hide cursor entirely if touch is primary input
+    const touchDevice =
+      window.matchMedia("(pointer: coarse)").matches ||
+      navigator.maxTouchPoints > 0;
+    if (touchDevice) {
+      setIsTouch(true);
+      return;
+    }
+
     // Hide system cursor globally
     document.documentElement.style.cursor = "none";
 
@@ -61,6 +71,8 @@ export default function CustomCursor() {
       cancelAnimationFrame(rafId);
     };
   }, []);
+
+  if (isTouch) return null;
 
   return (
     <>
