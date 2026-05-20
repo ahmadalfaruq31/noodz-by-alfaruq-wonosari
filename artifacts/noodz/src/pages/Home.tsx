@@ -6,6 +6,7 @@ import StatsSection from "@/components/StatsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import MarqueeTicker from "@/components/MarqueeTicker";
 
 export default function Home() {
   return (
@@ -34,7 +35,9 @@ export default function Home() {
         }}
       >
         <AboutSection />
+        <MarqueeTicker />
         <MenuGrid />
+        <MarqueeTicker reverse />
         <StatsSection />
         <TestimonialsSection />
         <CTASection />

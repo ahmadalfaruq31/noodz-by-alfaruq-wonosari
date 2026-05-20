@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import NotFound from "@/pages/not-found";
+import GrainOverlay from "@/components/GrainOverlay";
+import CustomCursor from "@/components/CustomCursor";
 
 function Router() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Router />
       </WouterRouter>
       <Toaster />
+      <GrainOverlay />
+      <CustomCursor />
     </TooltipProvider>
   );
 }
