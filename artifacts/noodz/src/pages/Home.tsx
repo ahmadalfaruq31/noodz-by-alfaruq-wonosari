@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import SequenceScroll from "@/components/SequenceScroll";
 import AboutSection from "@/components/AboutSection";
 import MenuGrid from "@/components/MenuGrid";
-import HowToOrder from "@/components/HowToOrder";
 import StatsSection from "@/components/StatsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
@@ -36,7 +35,6 @@ export default function Home() {
       >
         <AboutSection />
         <MenuGrid />
-        <HowToOrder />
         <StatsSection />
         <TestimonialsSection />
         <CTASection />
